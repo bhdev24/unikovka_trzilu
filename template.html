@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOUR TITLE HERE</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #ffffff;
+      color: #111111;
+      font-family: Georgia, 'Times New Roman', serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
+      font-weight: normal;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .textbox {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      line-height: 1.8;
+      color: #444444;
+      margin-bottom: 2.5rem;
+    }
+
+    .verify {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.85rem 1.1rem;
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      border: 1.5px solid #cccccc;
+      border-radius: 0;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.08em;
+      color: #111111;
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #111111;
+    }
+
+    input[type="text"].error {
+      border-color: #cc0000;
+    }
+
+    button {
+      padding: 0.85rem 2.5rem;
+      font-size: 0.85rem;
+      font-family: Georgia, serif;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #333333;
+    }
+
+    .error-msg {
+      font-size: 0.85rem;
+      color: #cc0000;
+      letter-spacing: 0.05em;
+      min-height: 1.2em;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HEADING — change this text -->
+    <h1>Your Heading Here</h1>
+
+    <!-- TEXT BOX — change this text -->
+    <p class="textbox">
+      Your description or message goes here. Replace this with whatever you need to say.
+    </p>
+
+    <!-- VERIFICATION FIELD -->
+    <div class="verify">
+      <input type="text" id="answer" placeholder="Enter your answer" autocomplete="off" />
+      <button onclick="checkAnswer()">Submit</button>
+      <p class="error-msg" id="errorMsg">Not correct. Try again.</p>
+    </div>
+
+  </div>
+
+  <script>
+    // -----------------------------------------------
+    // CHANGE THESE TWO VALUES:
+    var CORRECT_ANSWER = "CORRECT";       // the answer players must enter
+    var REDIRECT_URL   = "locationx";     // the page to redirect to on success
+    // -----------------------------------------------
+
+    function checkAnswer() {
+      var input = document.getElementById("answer");
+      var error = document.getElementById("errorMsg");
+      var value = input.value.trim().toUpperCase();
+
+      if (value === CORRECT_ANSWER.toUpperCase()) {
+        window.location.href = REDIRECT_URL;
+      } else {
+        input.classList.add("error");
+        error.style.display = "block";
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    document.getElementById("answer").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") checkAnswer();
+      document.getElementById("answer").classList.remove("error");
+      document.getElementById("errorMsg").style.display = "none";
+    });
+  </script>
+</body>
+</html>
