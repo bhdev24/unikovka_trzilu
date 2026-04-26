@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vzhůru za dobrodružstvím</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #ffffff;
+      color: #111111;
+      font-family: Georgia, 'Times New Roman', serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
+      font-weight: normal;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .textbox {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      line-height: 1.8;
+      color: #444444;
+      margin-bottom: 2.5rem;
+    }
+
+    .verify {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.85rem 1.1rem;
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      border: 1.5px solid #cccccc;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.08em;
+      color: #111111;
+      background: #ffffff;
+      transition: border-color 0.2s;
+      border-radius: 0;
+    }
+
+    input[type="text"]:focus { border-color: #111111; }
+    input[type="text"].error { border-color: #cc0000; }
+
+    button {
+      padding: 0.85rem 2.5rem;
+      font-size: 0.85rem;
+      font-family: Georgia, serif;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #333333; }
+
+    .error-msg {
+      font-size: 0.85rem;
+      color: #cc0000;
+      letter-spacing: 0.05em;
+      min-height: 1.2em;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Vzhůru za dobrodružstvím</h1>
+
+    <p class="textbox">
+      Vzhůru! Ale kam? No, než si váš průvodce vzpomene kam vás měl poslat za první stopou, zkuste si vzpomenout vy! Co byste podle jednoho z příběhů nikdy neměli zapomenout, když se vydáváte na cesty?
+    </p>
+
+    <div class="verify">
+      <input type="text" id="answer" placeholder="Vaše odpověď" autocomplete="off" />
+      <button onclick="checkAnswer()">Odevzdat odpověď</button>
+      <p class="error-msg" id="errorMsg">To není správně, zkuste to znovu.</p>
+    </div>
+
+  </div>
+
+  <script>
+    var CORRECT_ANSWERS = ["kapenik", "kapesník"];
+    var REDIRECT_URL = "/location-1-a";
+
+    function normalize(str) {
+      return str.trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function checkAnswer() {
+      var input = document.getElementById("answer");
+      var error = document.getElementById("errorMsg");
+      var value = normalize(input.value);
+
+      var correct = CORRECT_ANSWERS.some(function(a) {
+        return normalize(a) === value;
+      });
+
+      if (correct) {
+        window.location.href = REDIRECT_URL;
+      } else {
+        input.classList.add("error");
+        error.style.display = "block";
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    document.getElementById("answer").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") checkAnswer();
+      this.classList.remove("error");
+      document.getElementById("errorMsg").style.display = "none";
+    });
+  </script>
+</body>
+</html>
