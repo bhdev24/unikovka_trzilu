@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svatba šipkovaná</title>
+  <style>
+    @font-face {
+      font-family: 'Gelasio';
+      src: url('fonts/Gelasio-VariableFont_wght.ttf') format('truetype');
+      font-weight: 100 900;
+      font-style: normal;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #0a0806;
+      color: #c9a84c;
+      font-family: Gelasio, Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: #4a3a1a;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Progress */
+    .progress-text {
+      font-size: clamp(0.8rem, 3vw, 0.9rem);
+      font-style: italic;
+      color: #5a4520;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 1px;
+      background: #1e1608;
+      margin-bottom: 2.5rem;
+    }
+
+    .progress-bar-fill {
+      height: 1px;
+      background: #4a3a1a;
+      transition: width 0.4s ease;
+    }
+
+    /* Question — same as .quote */
+    .question-text {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      font-style: italic;
+      line-height: 1.9;
+      color: #a07c38;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border: none;
+      border-bottom: 1px solid #1e1608;
+      cursor: pointer;
+      background: transparent;
+      color: #c9a84c;
+      font-family: Gelasio, Georgia, serif;
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      font-style: italic;
+      line-height: 1.8;
+      text-align: left;
+      width: 100%;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .option:hover:not(:disabled) {
+      color: #a07c38;
+      border-bottom-color: #4a3a1a;
+    }
+
+    .option .letter {
+      color: #4a3a1a;
+      min-width: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .option.correct { color: #7ab87a; border-bottom-color: #4a7a3a; }
+    .option.correct .letter { color: #4a7a3a; }
+
+    .option.wrong { color: #b87a6a; border-bottom-color: #7a2a1a; }
+    .option.wrong .letter { color: #7a2a1a; }
+
+    .option.reveal-correct { color: #4a7a3a; border-bottom-color: #4a7a3a; opacity: 0.6; }
+    .option.reveal-correct .letter { color: #4a7a3a; }
+
+    .option:disabled { cursor: default; }
+
+    /* Feedback — same as .text */
+    .feedback {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      font-style: italic;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      min-height: 1.5rem;
+      color: transparent;
+    }
+    .feedback.ok { color: #5a8a5a; }
+    .feedback.fail { color: #8a5a4a; }
+
+    /* Dots */
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 2rem;
+    }
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #1e1608;
+      border: 1px solid #2a1e0a;
+    }
+    .dot.current { border-color: #4a3a1a; }
+    .dot.ok { background: #2a4a2a; border-color: #2a4a2a; }
+    .dot.fail { background: #4a1a0a; border-color: #4a1a0a; }
+
+    /* Button — same feel as template links */
+    .btn {
+      font-family: Gelasio, Georgia, serif;
+      font-size: clamp(0.8rem, 3vw, 0.9rem);
+      font-style: italic;
+      color: #5a4520;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 0;
+      transition: color 0.2s;
+    }
+    .btn:hover { color: #a07c38; }
+    .btn:disabled { opacity: 0.3; cursor: default; }
+
+    /* Error / result text — same as .text */
+    .result-text {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      font-style: italic;
+      line-height: 1.9;
+      color: #a07c38;
+      margin-bottom: 2.5rem;
+    }
+
+    .error-text {
+      font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+      font-style: italic;
+      line-height: 1.9;
+      color: #8a5a4a;
+      margin-bottom: 2.5rem;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Quiz screen -->
+    <div id="screen-quiz">
+      <div class="dots" id="dots"></div>
+      <div class="progress-text" id="progress-text"></div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <p class="question-text" id="question-text"></p>
+      <div class="options" id="options"></div>
+      <p class="feedback" id="feedback"></p>
+      <button class="btn" id="btn-next" onclick="nextQ()" disabled>pokračovat →</button>
+    </div>
+
+    <!-- Error screen -->
+    <div id="screen-error" class="hidden">
+      <p class="error-text" id="error-msg"></p>
+      <div class="divider"></div>
+      <button class="btn" onclick="restartQuiz()">zkusit znovu →</button>
+    </div>
+
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: 'Jaké kouzlo by Lucka nejraději ovládla?',
+        options: ['Depulso', 'Lumos', 'Accio', 'Expelliarmus'],
+        correct: 2
+      },
+      {
+        q: 'Do jaké bradavické koleje by Lucka patřila?',
+        options: ['Nebelvír', 'Mrzimor', 'Zmijozel', 'Havraspár'],
+        correct: 3
+      },
+      {
+        q: 'Jaký tvor by byl Lučin Patronus?',
+        options: ['Lama', 'Laň', 'Pes', 'Kůň'],
+        correct: 2
+      },
+      {
+        q: 'V jakém obchodě v Prasinkách by Lucku nejspíš našli?',
+        options: ['Krugoletka', 'Medový ráj', 'U Taškáře', 'Ollivanderova pobočka'],
+        correct: 3
+      },
+      {
+        q: 'Kde by Lucka ve Středozemi chtěla žít?',
+        options: ['V Kraji', 'V Rohanu', 'V Roklince', 'V Mordoru'],
+        correct: 2
+      },
+      {
+        q: 'Jaké kouzlo by Míra nejraději ovládl?',
+        options: ['Accio', 'Depulso', 'Alohomora', 'Stupefy'],
+        correct: 1
+      },
+      {
+        q: 'Do jaké bradavické koleje by Míra patřil?',
+        options: ['Havraspár', 'Zmijozel', 'Nebelvír', 'Mrzimor'],
+        correct: 2
+      },
+      {
+        q: 'Jaký tvor by byl Mírův Patronus?',
+        options: ['Pes', 'Vlk', 'Kůň', 'Lama'],
+        correct: 3
+      },
+      {
+        q: 'V jakém obchodě v Prasinkách by Míru nejspíš našli?',
+        options: ['Ollivanderova pobočka', 'Medový ráj', 'Krugoletka', 'U Taškáře'],
+        correct: 2
+      },
+      {
+        q: 'S kým by Míra šel ve Středozemi na večeři?',
+        options: ['S Gandalfem', 'S Aragornem', 'S Frodoem', 'Se Sauronem'],
+        correct: 3
+      }
+    ];
+
+    const letters = ['a', 'b', 'c', 'd'];
+    let current = 0;
+    let answers = Array(questions.length).fill(null);
+    let correctCount = 0;
+
+    function renderDots() {
+      const el = document.getElementById('dots');
+      el.innerHTML = questions.map((_, i) => {
+        let cls = 'dot';
+        if (answers[i] !== null) cls += answers[i] ? ' ok' : ' fail';
+        else if (i === current) cls += ' current';
+        return `<div class="${cls}"></div>`;
+      }).join('');
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      document.getElementById('progress-text').textContent = `${current + 1} / ${questions.length}`;
+      document.getElementById('progress-bar').style.width = ((current + 1) / questions.length * 100) + '%';
+      document.getElementById('question-text').textContent = q.q;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('btn-next').disabled = true;
+
+      const opts = document.getElementById('options');
+      opts.innerHTML = q.options.map((opt, i) => `
+        <button class="option" onclick="answer(${i})">
+          <span class="letter">${letters[i]}.</span>
+          <span>${opt}</span>
+        </button>
+      `).join('');
+
+      renderDots();
+    }
+
+    function answer(idx) {
+      const q = questions[current];
+      const btns = document.querySelectorAll('.option');
+      btns.forEach(b => b.disabled = true);
+
+      const isCorrect = idx === q.correct;
+      answers[current] = isCorrect;
+      if (isCorrect) correctCount++;
+
+      btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+      if (!isCorrect) btns[q.correct].classList.add('reveal-correct');
+
+      const fb = document.getElementById('feedback');
+      if (isCorrect) {
+        fb.textContent = 'Správně.';
+        fb.className = 'feedback ok';
+      } else {
+        fb.textContent = 'Špatně.';
+        fb.className = 'feedback fail';
+      }
+
+      document.getElementById('btn-next').disabled = false;
+      renderDots();
+    }
+
+    function nextQ() {
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('screen-quiz').classList.add('hidden');
+
+      if (correctCount >= 5) {
+        window.location.href = 'https://bhdev24.github.io/unikovka_trzilu/trivia-2';
+      } else {
+        const remaining = 5 - correctCount;
+        const r = remaining;
+        document.getElementById('error-msg').textContent =
+          `Dosáhli jste ${correctCount} z ${questions.length} správných odpovědí. Pro postup je potřeba alespoň 5. Chybí vám ${r} ${r === 1 ? 'odpověď' : r < 5 ? 'odpovědi' : 'odpovědí'}. Zkuste to znovu.`;
+        document.getElementById('screen-error').classList.remove('hidden');
+      }
+    }
+
+    function restartQuiz() {
+      current = 0;
+      answers = Array(questions.length).fill(null);
+      correctCount = 0;
+      document.getElementById('screen-error').classList.add('hidden');
+      document.getElementById('screen-quiz').classList.remove('hidden');
+      renderQuestion();
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>

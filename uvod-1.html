@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svatba šipkovaná</title>
+  <style>
+    @font-face {
+      font-family: 'Gelasio';
+      src: url('fonts/Gelasio-VariableFont_wght.ttf') format('truetype');
+      font-weight: 100 900;
+      font-style: normal;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #0a0806;
+      color: #c9a84c;
+      font-family: Gelasio, Gelasio, Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 8vw, 3rem);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      color: #c9a84c;
+    }
+
+    .textbox {
+      font-size: clamp(0.9rem, 3.5vw, 1rem);
+      line-height: 1.8;
+      color: #a07c38;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .verify {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.85rem 1.1rem;
+      font-size: 1rem;
+      font-family: Gelasio, Georgia, serif;
+      border: 1.5px solid #4a3a1a;
+      border-radius: 0;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      background: #0f0c08;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]::placeholder {
+      color: #4a3a1a;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    input[type="text"]:focus {
+      border-color: #c9a84c;
+    }
+
+    input[type="text"].error {
+      border-color: #8b2020;
+    }
+
+    button {
+      padding: 0.85rem 2.5rem;
+      font-size: 0.8rem;
+      font-family: Gelasio, Georgia, serif;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: transparent;
+      color: #c9a84c;
+      border: 1.5px solid #c9a84c;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    button:hover {
+      background: #c9a84c;
+      color: #0a0806;
+    }
+
+    .error-msg {
+      font-size: 0.8rem;
+      color: #8b2020;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      min-height: 1.2em;
+      display: none;
+    }
+
+    .hints {
+      margin-top: 3rem;
+      width: 100%;
+      border-top: 1px solid #2a1f0d;
+    }
+
+    .hint-item {
+      border-bottom: 1px solid #2a1f0d;
+    }
+
+    .hint-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      color: #6a5030;
+      font-family: Gelasio, Georgia, serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: left;
+      transition: color 0.2s;
+    }
+
+    .hint-toggle:hover {
+      color: #c9a84c;
+      background: transparent;
+    }
+
+    .hint-toggle .hint-icon {
+      font-size: 0.6rem;
+      letter-spacing: 0;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+      margin-left: 1rem;
+      color: #4a3a1a;
+    }
+
+    .hint-item.open .hint-toggle {
+      color: #c9a84c;
+    }
+
+    .hint-item.open .hint-toggle .hint-icon {
+      transform: rotate(180deg);
+      color: #c9a84c;
+    }
+
+    .hint-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease;
+    }
+
+    .hint-body-inner {
+      padding: 0 0 1.2rem 0;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: #7a5c2a;
+      letter-spacing: 0.04em;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- NADPIS — změňte tento text -->
+    <h1>Vzhůru!</h1>
+
+    <!-- TEXTOVÉ POLE — změňte tento text -->
+    <p class="textbox">
+      Ale kam? Kamkoliv se vydáte, je důležité být připraven na vše. Co si podle jednoho z příběhů nesmíte zapomenout, když jdete za dobrodružstvím?
+    </p>
+
+    <!-- OVĚŘOVACÍ POLE -->
+    <div class="verify">
+      <input type="text" id="answer" placeholder="Zadejte odpověď" autocomplete="off" />
+      <button onclick="checkAnswer()">Potvrdit</button>
+      <p class="error-msg" id="errorMsg">Špatná odpověď. Zkuste to znovu.</p>
+    </div>
+
+    <!-- NÁPOVĚDA -->
+    <div class="hints">
+
+      <div class="hint-item">
+        <button class="hint-toggle" onclick="toggleHint(this)">
+          <span>Nápověda 1</span>
+          <span class="hint-icon">&#9660;</span>
+        </button>
+        <div class="hint-body">
+          <div class="hint-body-inner">
+            <!-- ZDE VLOŽTE TEXT NÁPOVĚDY 1 -->
+            Každý příběh začíná první kapitolou. Zkuste začít také tam.
+          </div>
+        </div>
+      </div>
+
+      <div class="hint-item">
+        <button class="hint-toggle" onclick="toggleHint(this)">
+          <span>Nápověda 2</span>
+          <span class="hint-icon">&#9660;</span>
+        </button>
+        <div class="hint-body">
+          <div class="hint-body-inner">
+            <!-- ZDE VLOŽTE TEXT NÁPOVĚDY 2 -->
+            V každé kapitole je pár písmen odlišných. Teď je jen správně zkombinovat.
+          </div>
+        </div>
+      </div>
+
+      <div class="hint-item">
+        <button class="hint-toggle" onclick="toggleHint(this)">
+          <span>Řešení</span>
+          <span class="hint-icon">&#9660;</span>
+        </button>
+        <div class="hint-body">
+          <div class="hint-body-inner">
+            <!-- ZDE VLOŽTE TEXT ŘEŠENÍ -->
+            Kapesník
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // -----------------------------------------------
+    // ZMĚŇTE TYTO DVĚ HODNOTY:
+    var CORRECT_ANSWER = "kapesník";      // odpověď, kterou musí hráči zadat
+    var REDIRECT_URL   = "https://bhdev24.github.io/unikovka_trzilu/uvod-2";    // stránka, na kterou se přesměruje po úspěchu
+    // -----------------------------------------------
+
+    function checkAnswer() {
+      var input = document.getElementById("answer");
+      var error = document.getElementById("errorMsg");
+      var value = input.value.trim().toUpperCase();
+
+      if (value === CORRECT_ANSWER.toUpperCase()) {
+        window.location.href = REDIRECT_URL;
+      } else {
+        input.classList.add("error");
+        error.style.display = "block";
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    function toggleHint(btn) {
+      var item = btn.closest(".hint-item");
+      var body = item.querySelector(".hint-body");
+      var isOpen = item.classList.contains("open");
+
+      if (isOpen) {
+        body.style.maxHeight = "0";
+        item.classList.remove("open");
+      } else {
+        body.style.maxHeight = body.scrollHeight + "px";
+        item.classList.add("open");
+      }
+    }
+
+    document.getElementById("answer").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") checkAnswer();
+      document.getElementById("answer").classList.remove("error");
+      document.getElementById("errorMsg").style.display = "none";
+    });
+  </script>
+
+<!--
+  =============================================
+  MAP OVERLAY SNIPPET
+  =============================================
+  Vložte tento kód těsně před uzavírací </body> tag.
+  Upravte MAP_IMAGE_SRC na cestu k vašemu obrázku mapy.
+  =============================================
+-->
+
+<!-- 1. BUTTON — pevně v pravém horním rohu -->
+<button class="map-btn" onclick="openMap()" aria-label="Zobrazit mapu">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+    <line x1="9" y1="3" x2="9" y2="18"/>
+    <line x1="15" y1="6" x2="15" y2="21"/>
+  </svg>
+  Mapa
+</button>
+
+<!-- 2. OVERLAY -->
+<div class="map-overlay" id="mapOverlay" onclick="handleOverlayClick(event)">
+  <div class="map-modal">
+    <button class="map-close" onclick="closeMap()" aria-label="Zavřít">&#10005;</button>
+    <!-- ↓↓↓ ZMĚŇTE CESTU K OBRÁZKU MAPY ↓↓↓ -->
+    <img src="mapa_full.png" alt="Mapa" class="map-img" />
+  </div>
+</div>
+
+<!-- 3. STYLY -->
+<style>
+  .map-btn {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.2rem;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.7rem;
+    font-family: Gelasio, Georgia, serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9a84c;
+    background: #0a0806;
+    border: 1.5px solid #4a3a1a;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .map-btn:hover {
+    border-color: #c9a84c;
+    color: #c9a84c;
+  }
+
+  .map-btn svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .map-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(10, 8, 6, 0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .map-overlay.active {
+    display: flex;
+  }
+
+  .map-modal {
+    position: relative;
+    max-width: 680px;
+    width: 100%;
+    border: 1.5px solid #4a3a1a;
+    background: #0f0c08;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+
+  .map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  .map-close {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0806;
+    border: 1.5px solid #4a3a1a;
+    color: #6a5030;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: Gelasio, Georgia, serif;
+    letter-spacing: 0;
+    padding: 0;
+    text-transform: none;
+  }
+
+  .map-close:hover {
+    color: #c9a84c;
+    border-color: #c9a84c;
+    background: #0a0806;
+  }
+</style>
+
+<!-- 4. JAVASCRIPT -->
+<script>
+  function openMap() {
+    document.getElementById("mapOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMap() {
+    document.getElementById("mapOverlay").classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("mapOverlay")) closeMap();
+  }
+
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeMap();
+  });
+</script>
+
+</body>
+</html>

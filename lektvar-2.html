@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VÁŠ NÁZEV ZDE</title>
+  <style>
+    @font-face {
+      font-family: 'Gelasio';
+      src: url('fonts/Gelasio-VariableFont_wght.ttf') format('truetype');
+      font-weight: 100 900;
+      font-style: normal;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #0a0806;
+      color: #c9a84c;
+      font-family: Gelasio, Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+       h1 {
+      font-size: clamp(1.5rem, 8vw, 3rem);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      color: #c9a84c;
+    }
+
+    .textbox {
+      font-size: clamp(0.9rem, 3.5vw, 1rem);
+      line-height: 1.8;
+      color: #a07c38;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .textbox-source {
+      font-size: clamp(0.75rem, 3vw, 0.85rem);
+      line-height: 1.6;
+      color: #6a5030;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.08em;
+      font-style: italic;
+    }
+
+    .textbox-italic {
+      font-size: clamp(0.9rem, 3.5vw, 1rem);
+      line-height: 1.8;
+      color: #a07c38;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.04em;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+   <!-- NADPIS — změňte tento text -->
+    <h1>Správně!</h1>
+
+    <!-- ODSTAVEC — kurzíva -->
+    <p class="textbox-italic">
+      „Hodiny lektvarů  se konaly v jedné podzemní místnosti. Byla tam větší zima než nahoře na hradě  a studentům by tam běhala po zádech husí kůže i bez všelijakých živočichů, naložených v láku ve skleněných nádobách všude po stěnách.“
+    </p>
+
+    <!-- ZDROJ — název knihy -->
+    <p class="textbox-source">
+      — Harry Potter a Kámen mudrců
+    </p>
+
+    <!-- NAVIGAČNÍ INSTRUKCE — kam jít dál -->
+    <p class="textbox">
+      Prohlédněte si mapu, Vaše cesta pokračuje na XXX
+    </p>
+
+    <!-- TŘETÍ ODSTAVEC — kurzíva -->
+    <p class="textbox-italic">
+V Prasinkách by Lucku nejspíš pohltila Ollivanderova pobočka, zatímco Míru by přitáhl obchod s košťaty Krugoletka.    </p>
+
+
+  </div>
+
+<!--
+  =============================================
+  MAP OVERLAY SNIPPET
+  =============================================
+  Vložte tento kód těsně před uzavírací </body> tag.
+  Upravte MAP_IMAGE_SRC na cestu k vašemu obrázku mapy.
+  =============================================
+-->
+
+<!-- 1. BUTTON — pevně v pravém horním rohu -->
+<button class="map-btn" onclick="openMap()" aria-label="Zobrazit mapu">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+    <line x1="9" y1="3" x2="9" y2="18"/>
+    <line x1="15" y1="6" x2="15" y2="21"/>
+  </svg>
+  Mapa
+</button>
+
+<!-- 2. OVERLAY -->
+<div class="map-overlay" id="mapOverlay" onclick="handleOverlayClick(event)">
+  <div class="map-modal">
+    <button class="map-close" onclick="closeMap()" aria-label="Zavřít">&#10005;</button>
+    <!-- ↓↓↓ ZMĚŇTE CESTU K OBRÁZKU MAPY ↓↓↓ -->
+    <img src="mapa_full.png" alt="Mapa" class="map-img" />
+  </div>
+</div>
+
+<!-- 3. STYLY -->
+<style>
+  .map-btn {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.2rem;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.7rem;
+    font-family: Gelasio, Georgia, serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9a84c;
+    background: #0a0806;
+    border: 1.5px solid #4a3a1a;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .map-btn:hover {
+    border-color: #c9a84c;
+    color: #c9a84c;
+  }
+
+  .map-btn svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .map-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(10, 8, 6, 0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .map-overlay.active {
+    display: flex;
+  }
+
+  .map-modal {
+    position: relative;
+    max-width: 680px;
+    width: 100%;
+    border: 1.5px solid #4a3a1a;
+    background: #0f0c08;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+
+  .map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  .map-close {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0806;
+    border: 1.5px solid #4a3a1a;
+    color: #6a5030;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: Gelasio, Georgia, serif;
+    letter-spacing: 0;
+    padding: 0;
+    text-transform: none;
+  }
+
+  .map-close:hover {
+    color: #c9a84c;
+    border-color: #c9a84c;
+    background: #0a0806;
+  }
+</style>
+
+<!-- 4. JAVASCRIPT -->
+<script>
+  function openMap() {
+    document.getElementById("mapOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMap() {
+    document.getElementById("mapOverlay").classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("mapOverlay")) closeMap();
+  }
+
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeMap();
+  });
+</script>
+
+</body>
+</html>
